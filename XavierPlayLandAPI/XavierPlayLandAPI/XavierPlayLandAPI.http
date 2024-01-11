@@ -1,0 +1,6 @@
+@XavierPlayLandAPI_HostAddress = http://localhost:5027
+
+GET {{XavierPlayLandAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
