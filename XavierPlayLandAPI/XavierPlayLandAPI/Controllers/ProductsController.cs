@@ -42,7 +42,8 @@ namespace XavierPlayLandAPI.Controllers
         {
             if (product.CategoryId.HasValue && !await _categoryRepository.CategoryExists(product.CategoryId.Value))
             {
-                return BadRequest("The Category ID you are inputting does not exist!");
+                return BadRequest("The Category ID you are inp" +
+                    "utting does not exist!");
             }
 
             await _productRepository.AddProduct(product);

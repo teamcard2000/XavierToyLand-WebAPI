@@ -12,7 +12,6 @@ namespace XavierPlayLandAPI.Models.Repositories
 
         public async Task<IEnumerable<Order>> GetAllOrders() 
         {
-            // Assuming you have a method to calculate the subtotal for each OrderDetail
             foreach (var order in TemporaryOrders.Orders)
             {
                 foreach (var detail in order.OrderDetails)
@@ -60,10 +59,32 @@ namespace XavierPlayLandAPI.Models.Repositories
 
                 // retrieve the product to get the price
                 var product = await _productRepository.GetProductById(detail.ProductId);
+
+
                 if (product != null)
                 {
-                    detail.Price = product.Price.GetValueOrDefault();
-                    detail.Order_Subtotal = detail.CalculateSubtotal(); // Ensure CalculateSubtotal() method exists
+                    if (product.Quantity <= 0)
+                    {
+                        throw new ArgumentException("This product is out of stock.");
+                    }
+                    else if (detail.Quantity > product.Quantity)
+                    {
+                        throw new ArgumentException($"The requested quantity for Product ID {detail.ProductId} exceeds the available stock.");
+                    }
+                    else
+                    {
+                        product.Quantity -= detail.Quantity;
+                        if (product.Quantity <= 0 && product.isAvailable == true)
+                        {
+                            product.isAvailable = false;
+                        }
+
+                        detail.Price = product.Price.GetValueOrDefault();
+                        detail.Order_Subtotal = detail.CalculateSubtotal();
+
+                        // set order status to ordered when they order the product
+                        order.Order_Status = "Ordered";
+                    }
                 }
                 else
                 {
@@ -81,32 +102,17 @@ namespace XavierPlayLandAPI.Models.Repositories
 
         public async Task UpdateOrder(Order updatedOrder)
         {
-            // check if user exists
+            // Check if the user exists
             var userExists = TemporaryUsers.Users.Any(u => u.Id == updatedOrder.UserId);
             if (!userExists)
             {
                 throw new ArgumentException("User does not exist.");
             }
 
-            // Set product prices and calculate order subtotal
-            foreach (var detail in updatedOrder.OrderDetails)
-            {
-                var product = await _productRepository.GetProductById(detail.ProductId);
-                if (product != null)
-                {
-                    detail.Price = product.Price.GetValueOrDefault();
-                    detail.Order_Subtotal = detail.CalculateSubtotal(); // Ensure CalculateSubtotal() method exists
-                }
-                else
-                {
-                    throw new ArgumentException($"Product with ID {detail.ProductId} does not exist.");
-                }
-            }
-
+            // Retrieve the existing order and update it
             var order = TemporaryOrders.Orders.FirstOrDefault(o => o.Id == updatedOrder.Id);
             if (order != null)
             {
-                // Update order properties
                 order.UserId = updatedOrder.UserId;
                 order.Order_Date = updatedOrder.Order_Date;
                 order.Shipping_Address = updatedOrder.Shipping_Address;
@@ -114,9 +120,20 @@ namespace XavierPlayLandAPI.Models.Repositories
                 order.Payment_Method = updatedOrder.Payment_Method;
                 order.Order_Status = updatedOrder.Order_Status;
 
-                // If order details are provided, update them
                 if (updatedOrder.OrderDetails != null && updatedOrder.OrderDetails.Any())
                 {
+                    // Validate and set product prices and calculate order subtotal
+                    foreach (var detail in updatedOrder.OrderDetails)
+                    {
+                        var product = await _productRepository.GetProductById(detail.ProductId);
+                        if (product != null)
+                        {
+                            // re-calculate the subtotal
+                            detail.Price = product.Price.GetValueOrDefault();
+                            detail.Order_Subtotal = detail.CalculateSubtotal();
+                        }
+                    }
+
                     // Remove existing details
                     TemporaryOrders.OrderDetails.RemoveAll(od => od.OrderId == updatedOrder.Id);
 
@@ -124,17 +141,21 @@ namespace XavierPlayLandAPI.Models.Repositories
                     int maxOrderDetailId = TemporaryOrders.OrderDetails.Any() ? TemporaryOrders.OrderDetails.Max(od => od.Id) : 0;
                     foreach (var detail in updatedOrder.OrderDetails)
                     {
-                        detail.Id = ++maxOrderDetailId; // Auto-increment the ID
-                        detail.OrderId = updatedOrder.Id; // Ensure the OrderId is set
-                        TemporaryOrders.OrderDetails.Add(detail); // Add to the static list
+                        detail.Id = ++maxOrderDetailId;
+                        detail.OrderId = updatedOrder.Id;
+                        TemporaryOrders.OrderDetails.Add(detail);
                     }
 
                     // Update the OrderDetails reference in the order object
                     order.OrderDetails = updatedOrder.OrderDetails;
-                }
 
-                // Recalculate the order total
-                order.Order_Total = order.CalculateTotal();
+                    // Recalculate the order total
+                    order.Order_Total = order.CalculateTotal();
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Order does not exist.");
             }
         }
 

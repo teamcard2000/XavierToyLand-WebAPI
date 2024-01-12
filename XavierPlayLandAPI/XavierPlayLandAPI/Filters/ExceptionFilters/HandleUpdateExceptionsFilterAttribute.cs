@@ -43,6 +43,15 @@ namespace XavierPlayLandAPI.Filters.ExceptionFilters
                 });
                 context.ExceptionHandled = true;
             }
+            else if (context.Exception is UpdateUserReviewException)
+            {
+                context.Result = new BadRequestObjectResult(new
+                {
+                    message = "An error occurred while updating a user review item.",
+                    details = context.Exception.Message
+                });
+                context.ExceptionHandled = true;
+            }
 
             base.OnException(context);
         }
@@ -62,6 +71,10 @@ namespace XavierPlayLandAPI.Filters.ExceptionFilters
         public class UpdateOrderException : Exception
         {
             public UpdateOrderException(string message) : base(message) { }
+        }
+        public class UpdateUserReviewException : Exception
+        {
+            public UpdateUserReviewException(string message) : base(message) { }
         }
     }
 }

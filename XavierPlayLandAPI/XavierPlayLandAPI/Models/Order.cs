@@ -22,12 +22,12 @@ namespace XavierPlayLandAPI.Models
 
         public List<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
+        // calculate the total for that product in quantity
         public double CalculateTotal()
         {
             double total = 0;
             foreach (var detail in OrderDetails)
             {
-                // Assume that each OrderDetail now has a Price property set when it's created
                 total += detail.Quantity * detail.Order_Subtotal;
             }
             return total;

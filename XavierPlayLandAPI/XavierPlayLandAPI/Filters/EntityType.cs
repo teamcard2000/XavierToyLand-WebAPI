@@ -5,5 +5,6 @@ public enum EntityType
     Product,
     Category,
     User,
-    Order
+    Order,
+    Review
 }

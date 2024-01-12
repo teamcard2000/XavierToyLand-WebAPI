@@ -30,6 +30,9 @@ namespace XavierPlayLandAPI.Filters.ActionFilters
                 case EntityType.Order:
                     ValidateOrder(context);
                     break;
+                case EntityType.Review:
+                    await ValidateUserReview(context);
+                    break;
                 default:
                     context.Result = new BadRequestObjectResult("Invalid entity type.");
                     return;
@@ -152,6 +155,37 @@ namespace XavierPlayLandAPI.Filters.ActionFilters
                 if (existingOrder != null)
                 {
                     context.ModelState.AddModelError("Order", "This order already exists.");
+                    var problemDetails = new ValidationProblemDetails(context.ModelState)
+                    {
+                        Status = StatusCodes.Status400BadRequest
+                    };
+                    context.Result = new BadRequestObjectResult(problemDetails);
+                    return;
+                }
+            }
+        }
+
+        private async Task ValidateUserReview(ActionExecutingContext context)
+        {
+            var reviewRepository = context.HttpContext.RequestServices.GetService<IUserReviewRepository>();
+            var review = context.ActionArguments["review"] as UserReview;
+
+            if (review == null)
+            {
+                context.ModelState.AddModelError("Review", "User review is null.");
+                var problemDetails = new ValidationProblemDetails(context.ModelState)
+                {
+                    Status = StatusCodes.Status400BadRequest
+                };
+                context.Result = new BadRequestObjectResult(problemDetails);
+                return;
+            }
+            else
+            {
+                var existingReview = await reviewRepository.GetReviewById(review.Id);
+                if (existingReview != null)
+                {
+                    context.ModelState.AddModelError("Review", "This user review already exists.");
                     var problemDetails = new ValidationProblemDetails(context.ModelState)
                     {
                         Status = StatusCodes.Status400BadRequest

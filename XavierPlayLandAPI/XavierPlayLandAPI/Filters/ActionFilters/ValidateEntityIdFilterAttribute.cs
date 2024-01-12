@@ -42,6 +42,9 @@ namespace XavierPlayLandAPI.Filters.ActionFilters
                 case EntityType.Order:
                     ValidateOrder(context, id);
                     break;
+                case EntityType.Review:
+                    await ValidateUserReview(context, id);
+                    break;
                 default:
                     context.Result = new BadRequestObjectResult("Invalid entity type.");
                     return;
@@ -93,6 +96,14 @@ namespace XavierPlayLandAPI.Filters.ActionFilters
             }
         }
 
-        // You can add similar methods for Category and User validation.
+        private async Task ValidateUserReview(ActionExecutingContext context, int id)
+        {
+            var reviewRepository = context.HttpContext.RequestServices.GetService<IUserReviewRepository>();
+            var review = await reviewRepository.GetReviewById(id);
+            if (review == null)
+            {
+                context.Result = new NotFoundObjectResult($"User Review with ID {id} not found.");
+            }
+        }
     }
 }

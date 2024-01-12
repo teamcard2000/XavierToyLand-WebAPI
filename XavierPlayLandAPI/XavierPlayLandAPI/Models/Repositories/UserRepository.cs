@@ -22,7 +22,7 @@ namespace XavierPlayLandAPI.Models.Repositories
                 throw new Exception("Username can only contain letters and numbers.");
             }
 
-            // Check if the role is either 'admin' or 'user'.
+            // Check if the role is either 'Admin' or 'User'.
             if (!Regex.IsMatch(user.Role, @"\b(Admin|User)\b"))
             {
                 throw new Exception("Role must be either 'admin' or 'user'.");

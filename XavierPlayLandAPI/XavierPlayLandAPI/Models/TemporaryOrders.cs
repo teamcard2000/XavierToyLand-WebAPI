@@ -19,7 +19,6 @@ namespace XavierPlayLandAPI.Models
 
         static TemporaryOrders()
         {
-            // Link order details to orders and calculate totals
             foreach (var order in Orders)
             {
                 var detailsForOrder = OrderDetails.Where(od => od.OrderId == order.Id).ToList();
