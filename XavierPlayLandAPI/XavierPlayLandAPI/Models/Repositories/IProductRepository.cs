@@ -8,5 +8,6 @@
         Task UpdateProduct(Product product);
         Task DeleteProduct(int id);
         Task<bool> AnyProductWithCategoryId(int id);
+        bool ProductExists(int productId);
     }
 }

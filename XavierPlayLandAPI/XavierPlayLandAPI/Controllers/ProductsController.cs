@@ -5,6 +5,7 @@ using XavierPlayLandAPI.Models;
 using XavierPlayLandAPI.Filters.ActionFilters;
 using XavierPlayLandAPI.Filters.ExceptionFilters;
 using Microsoft.AspNetCore.Authorization;
+using XavierPlayLandAPI.Filters;
 
 namespace XavierPlayLandAPI.Controllers
 {
@@ -29,14 +30,14 @@ namespace XavierPlayLandAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        [ValidateProductIdFilter]
+        [ValidateEntityIdFilter(EntityType.Product)]
         public async Task<IActionResult> GetProduct(int id)
         {
             return Ok(await _productRepository.GetProductById(id));
         }
 
         [HttpPost]
-        [ValidateAddProductFilter]
+        [ValidateAddEntityFilter(EntityType.Product)]
         public async Task<IActionResult> AddProduct(Product product)
         {
             if (product.CategoryId.HasValue && !await _categoryRepository.CategoryExists(product.CategoryId.Value))
@@ -49,8 +50,8 @@ namespace XavierPlayLandAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        [ValidateProductIdFilter]
-        [ValidateUpdateProductFilter]
+        [ValidateEntityIdFilter(EntityType.Product)]
+        [ValidateUpdateEntityFilter(EntityType.Product)]
         [HandleUpdateExceptionsFilter]
         public async Task<IActionResult> UpdateProduct(int id, Product product)
         {
@@ -69,7 +70,7 @@ namespace XavierPlayLandAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        [ValidateProductIdFilter]
+        [ValidateEntityIdFilter(EntityType.Product)]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             await _productRepository.DeleteProduct(id);

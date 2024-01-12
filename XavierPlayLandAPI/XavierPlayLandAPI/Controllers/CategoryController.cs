@@ -6,6 +6,7 @@ using System.Linq;
 using XavierPlayLandAPI.Filters.ActionFilters;
 using XavierPlayLandAPI.Filters.ExceptionFilters;
 using Microsoft.AspNetCore.Authorization;
+using XavierPlayLandAPI.Filters;
 
 namespace XavierPlayLandAPI.Controllers
 {
@@ -31,7 +32,7 @@ namespace XavierPlayLandAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        [ValidateCategoryIdFilter]
+        [ValidateEntityIdFilter(EntityType.Category)]
         public async Task<IActionResult> GetCategory(int id)
         {
             var category = await _categoryRepository.GetCategoryById(id);
@@ -44,7 +45,7 @@ namespace XavierPlayLandAPI.Controllers
         }
 
         [HttpPost]
-        [ValidateAddCategoryFilter]
+        [ValidateAddEntityFilter(EntityType.Category)]
         public async Task<IActionResult> AddCategory(Category category)
         {
             await _categoryRepository.AddCategory(category);
@@ -52,8 +53,8 @@ namespace XavierPlayLandAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        [ValidateCategoryIdFilter]
-        [ValidateUpdateCategoryFilter]
+        [ValidateEntityIdFilter(EntityType.Category)]
+        [ValidateUpdateEntityFilter(EntityType.Category)]
         [HandleUpdateExceptionsFilter]
         public async Task<IActionResult> UpdateCategory(int id, Category category)
         {
@@ -67,7 +68,7 @@ namespace XavierPlayLandAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        [ValidateCategoryIdFilter]
+        [ValidateEntityIdFilter(EntityType.Category)]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             // Check if any products are associated with this category

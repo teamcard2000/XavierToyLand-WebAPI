@@ -5,10 +5,15 @@
         private static List<Product> _products = new List<Product>
         {
             // Example products - you can add more or start with an empty list
-            new Product { Id = 1, Name = "Product 1", Description = "desc 1", Brand = "brand 1", CategoryId = 1, Price = 10.99, ImagePath = "image1.jpg" },
-            new Product { Id = 2, Name = "Product 2", Description = "desc 2", Brand = "brand 2", CategoryId = 2, Price = 15.50, ImagePath = "image2.jpg" },
-            new Product { Id = 3, Name = "Product 3", Description = "desc 3", Brand = "brand 3", CategoryId = 3, Price = 23.99, ImagePath = "image3.jpg" }
+            new Product { Id = 1, Name = "Product 1", Description = "desc 1", Brand = "brand 1", CategoryId = 1, Price = 10.99, Quantity = 5, ImagePath = "image1.jpg" },
+            new Product { Id = 2, Name = "Product 2", Description = "desc 2", Brand = "brand 2", CategoryId = 2, Price = 15.50, Quantity = 3, ImagePath = "image2.jpg" },
+            new Product { Id = 3, Name = "Product 3", Description = "desc 3", Brand = "brand 3", CategoryId = 3, Price = 23.99, Quantity = 1, ImagePath = "image3.jpg" }
         };
+
+        public bool ProductExists(int productId)
+        {
+            return _products.Any(p => p.Id == productId);
+        }
 
         public Task<bool> AnyProductWithCategoryId(int categoryId)
         {
@@ -45,6 +50,7 @@
                 existingProduct.Brand = product.Brand;
                 existingProduct.CategoryId = product.CategoryId;
                 existingProduct.Price = product.Price;
+                existingProduct.Quantity = product.Quantity;
                 existingProduct.ImagePath = product.ImagePath;
             }
             return Task.CompletedTask;

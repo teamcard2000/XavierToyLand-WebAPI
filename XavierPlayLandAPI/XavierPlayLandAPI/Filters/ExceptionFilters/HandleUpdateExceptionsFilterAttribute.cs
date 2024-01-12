@@ -34,6 +34,15 @@ namespace XavierPlayLandAPI.Filters.ExceptionFilters
                 });
                 context.ExceptionHandled = true;
             }
+            else if (context.Exception is UpdateOrderException)
+            {
+                context.Result = new BadRequestObjectResult(new
+                {
+                    message = "An error occurred while updating the order item.",
+                    details = context.Exception.Message
+                });
+                context.ExceptionHandled = true;
+            }
 
             base.OnException(context);
         }
@@ -49,6 +58,10 @@ namespace XavierPlayLandAPI.Filters.ExceptionFilters
         public class UpdateUserException : Exception
         {
             public UpdateUserException(string message) : base(message) { }
+        }
+        public class UpdateOrderException : Exception
+        {
+            public UpdateOrderException(string message) : base(message) { }
         }
     }
 }

@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using XavierPlayLandAPI.Filters;
 
 namespace XavierPlayLandAPI.Models
 {
-    public class User
+    public class User : IEntity
     {
         public int Id { get; set; }
         [RegularExpression(@"^[a-zA-Z0-9]*$", ErrorMessage = "Username can only contain letters and numbers.")]

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Runtime.ConstrainedExecution;
 using XavierPlayLandAPI.Filters.ActionFilters;
 using XavierPlayLandAPI.Filters.ExceptionFilters;
+using XavierPlayLandAPI.Filters;
 
 namespace XavierPlayLandAPI.Controllers
 {
@@ -29,7 +30,7 @@ namespace XavierPlayLandAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        [ValidateUserIdFilter]
+        [ValidateEntityIdFilter(EntityType.User)]
         public IActionResult GetUser(int id) 
         { 
             var user = _userRepository.GetUserById(id);
@@ -37,7 +38,7 @@ namespace XavierPlayLandAPI.Controllers
         }
 
         [HttpPost]
-        [ValidateAddUserFilter]
+        [ValidateAddEntityFilter(EntityType.User)]
         public IActionResult AddUser([FromBody] User user)
         {
             if (!ModelState.IsValid)
@@ -61,8 +62,8 @@ namespace XavierPlayLandAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        [ValidateUserIdFilter]
-        [ValidateUpdateUserFilter]
+        [ValidateEntityIdFilter(EntityType.User)]
+        [ValidateUpdateEntityFilter(EntityType.User)]
         [HandleUpdateExceptionsFilter]
         public IActionResult UpdateUser(int id, [FromBody] User user)
         {
@@ -91,7 +92,7 @@ namespace XavierPlayLandAPI.Controllers
 
 
         [HttpDelete("{id}")]
-        [ValidateUserIdFilter]
+        [ValidateEntityIdFilter(EntityType.User)]
         public IActionResult DeleteUser(int id)
         {
             var user = _userRepository.GetUserById(id);
